@@ -67,6 +67,8 @@ def _process_batch(req: GenerateRequest) -> None:
 
 @app.post("/generate")
 def generate(req: GenerateRequest) -> JSONResponse:
+    if not req.prompts:
+        raise HTTPException(status_code=400, detail={"detail": "prompts must not be empty"})
     stems = {item.stem for item in req.prompts}
     with lock:
         if state.status == "generating":
