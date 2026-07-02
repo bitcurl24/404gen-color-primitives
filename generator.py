@@ -22,6 +22,7 @@ class ImageFeatures:
     warm_bias: float
     dominant_ratio: float
     diagonal_energy: float
+    foreground_ratio: float
     seed_value: int
 
 
@@ -48,7 +49,7 @@ def _fallback_features(stem: str, seed: int) -> ImageFeatures:
     for i in range(4):
         v = _stable_int(f"{stem}:{i}", seed)
         colors.append(f"0x{(v >> 16) & 255:02x}{(v >> 8) & 255:02x}{v & 255:02x}")
-    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, 0.25, 0.2, base)
+    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, 0.25, 0.2, 0.5, base)
 
 
 def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
@@ -65,6 +66,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
     lum = flat @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
     brightness = float(np.mean(lum))
     saturation = float(np.mean(np.max(flat, axis=1) - np.min(flat, axis=1)))
+    foreground_ratio = float(np.mean(lum < np.quantile(lum, 0.62)))
     color_variance = float(np.mean(np.std(flat, axis=0)))
     warm_bias = float(np.mean(flat[:, 0] - flat[:, 2]))
 
@@ -98,6 +100,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
         warm_bias=max(-1.0, min(1.0, warm_bias)),
         dominant_ratio=dominant_ratio,
         diagonal_energy=min(1.0, diagonal_energy * 4.0),
+        foreground_ratio=foreground_ratio,
         seed_value=_stable_int(stem, seed),
     )
 
