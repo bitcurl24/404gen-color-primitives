@@ -108,6 +108,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     horn = 0.06 + 0.04 * ((f.seed_value >> 3) % 5) / 4.0
     tilt = (((f.seed_value >> 9) % 21) - 10) / 300.0
     accent_metalness = 0.01 + f.color_variance * 0.04
+    nose_sides = 6 if f.warm_bias < 0 else 9
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
@@ -140,7 +141,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     spike.rotation.z = -i * 0.38;
     group.add(spike);
   }}
-  const nose = new THREE.Mesh(new THREE.ConeGeometry({body_w * 0.18:.4f}, {body_d * 0.55:.4f}, 8), accentMat);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry({body_w * 0.18:.4f}, {body_d * 0.55:.4f}, {nose_sides}), accentMat);
   nose.rotation.x = Math.PI / 2;
   nose.position.z = {body_d / 2 + body_d * 0.20:.4f};
   group.add(nose);
