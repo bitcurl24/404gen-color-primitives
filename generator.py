@@ -21,6 +21,7 @@ class ImageFeatures:
     color_variance: float
     warm_bias: float
     dominant_ratio: float
+    diagonal_energy: float
     seed_value: int
 
 
@@ -47,7 +48,7 @@ def _fallback_features(stem: str, seed: int) -> ImageFeatures:
     for i in range(4):
         v = _stable_int(f"{stem}:{i}", seed)
         colors.append(f"0x{(v >> 16) & 255:02x}{(v >> 8) & 255:02x}{v & 255:02x}")
-    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, 0.25, base)
+    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, 0.25, 0.2, base)
 
 
 def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
@@ -83,6 +84,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
     gray = arr @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
     gx = np.abs(np.diff(gray, axis=1))
     gy = np.abs(np.diff(gray, axis=0))
+    diagonal_energy = float(np.mean(np.abs(gray[1:, 1:] - gray[:-1, :-1])))
     edge_density = float(min(1.0, (np.mean(gx) + np.mean(gy)) * 4.0))
     symmetry = 1.0 - float(np.mean(np.abs(gray - np.fliplr(gray))))
     return ImageFeatures(
@@ -95,6 +97,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
         color_variance=min(1.0, color_variance * 2.2),
         warm_bias=max(-1.0, min(1.0, warm_bias)),
         dominant_ratio=dominant_ratio,
+        diagonal_energy=min(1.0, diagonal_energy * 4.0),
         seed_value=_stable_int(stem, seed),
     )
 
