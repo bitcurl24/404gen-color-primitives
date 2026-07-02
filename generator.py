@@ -105,7 +105,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     body_w = min(0.46, max(0.22, 0.31 * f.aspect))
     body_d = max(0.18, min(0.40, 0.28 + 0.08 * f.edge_density))
     segments = 8 if f.edge_density < 0.35 else 12
-    side_count = 2 + int(f.saturation * 4)
+    side_count = 2 + int(f.saturation * 4) + int(f.dominant_ratio < 0.18)
     mirrored = "true" if f.vertical_symmetry > 0.58 else "false"
     c0, c1, c2, c3 = f.colors
     horn = 0.06 + 0.04 * ((f.seed_value >> 3) % 5) / 4.0
