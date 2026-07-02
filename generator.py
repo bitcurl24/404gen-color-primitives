@@ -107,7 +107,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
 
 def build_module(stem: str, image_url: str, seed: int) -> str:
     f = extract_features(stem, image_url, seed)
-    body_h = 0.34 + 0.12 * f.brightness
+    body_h = 0.32 + 0.12 * f.brightness + 0.05 * f.foreground_ratio
     body_w = min(0.46, max(0.22, 0.31 * f.aspect))
     body_d = max(0.18, min(0.40, 0.28 + 0.08 * f.edge_density))
     segments = 8 if f.edge_density < 0.35 else 12
