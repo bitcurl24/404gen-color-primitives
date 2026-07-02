@@ -19,6 +19,7 @@ class ImageFeatures:
     edge_density: float
     vertical_symmetry: float
     color_variance: float
+    warm_bias: float
     seed_value: int
 
 
@@ -45,7 +46,7 @@ def _fallback_features(stem: str, seed: int) -> ImageFeatures:
     for i in range(4):
         v = _stable_int(f"{stem}:{i}", seed)
         colors.append(f"0x{(v >> 16) & 255:02x}{(v >> 8) & 255:02x}{v & 255:02x}")
-    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, base)
+    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, base)
 
 
 def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
@@ -63,6 +64,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
     brightness = float(np.mean(lum))
     saturation = float(np.mean(np.max(flat, axis=1) - np.min(flat, axis=1)))
     color_variance = float(np.mean(np.std(flat, axis=0)))
+    warm_bias = float(np.mean(flat[:, 0] - flat[:, 2]))
 
     quant = np.clip((flat * 5).astype(np.int32), 0, 4)
     bins = quant[:, 0] * 25 + quant[:, 1] * 5 + quant[:, 2]
@@ -89,6 +91,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
         edge_density=edge_density,
         vertical_symmetry=max(0.0, min(1.0, symmetry)),
         color_variance=min(1.0, color_variance * 2.2),
+        warm_bias=max(-1.0, min(1.0, warm_bias)),
         seed_value=_stable_int(stem, seed),
     )
 
