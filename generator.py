@@ -118,6 +118,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     tilt = (((f.seed_value >> 9) % 21) - 10) / 300.0 + (f.diagonal_energy - 0.2) * 0.05
     accent_metalness = 0.01 + f.color_variance * 0.04
     nose_sides = 6 if f.warm_bias < 0 else 9
+    cap_lift = body_h / 2 + 0.040 + 0.018 * f.foreground_ratio
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
@@ -129,7 +130,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
   group.add(body);
   const cap = new THREE.Mesh(new THREE.SphereGeometry({min(body_w, body_d) * 0.45:.4f}, {segments}, 6), accentMat);
   cap.scale.y = {0.65 + f.saturation * 0.45:.4f};
-  cap.position.y = {body_h / 2 + 0.045:.4f};
+  cap.position.y = {cap_lift:.4f};
   group.add(cap);
   const footGeo = new THREE.BoxGeometry({body_w / 3:.4f}, 0.055, {body_d / 2.4:.4f});
   for (let i = 0; i < {side_count}; i++) {{
