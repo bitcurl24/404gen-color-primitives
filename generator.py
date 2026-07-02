@@ -104,12 +104,13 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     c0, c1, c2, c3 = f.colors
     horn = 0.06 + 0.04 * ((f.seed_value >> 3) % 5) / 4.0
     tilt = (((f.seed_value >> 9) % 21) - 10) / 300.0
+    accent_metalness = 0.01 + f.color_variance * 0.04
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
   const accentMat = new THREE.MeshStandardMaterial({{ color: {c1}, roughness: 0.64, metalness: 0.02 }});
   const darkMat = new THREE.MeshStandardMaterial({{ color: {c2}, roughness: 0.88, metalness: 0.0 }});
-  const lightMat = new THREE.MeshStandardMaterial({{ color: {c3}, roughness: 0.58, metalness: 0.01 }});
+  const lightMat = new THREE.MeshStandardMaterial({{ color: {c3}, roughness: 0.58, metalness: {accent_metalness:.4f} }});
   const body = new THREE.Mesh(new THREE.BoxGeometry({body_w:.4f}, {body_h:.4f}, {body_d:.4f}, 1, 1, 1), baseMat);
   body.rotation.z = {tilt:.4f};
   group.add(body);
