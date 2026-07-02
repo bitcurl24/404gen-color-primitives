@@ -112,7 +112,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     mirrored = "true" if f.vertical_symmetry > 0.58 else "false"
     c0, c1, c2, c3 = f.colors
     horn = 0.06 + 0.04 * ((f.seed_value >> 3) % 5) / 4.0
-    tilt = (((f.seed_value >> 9) % 21) - 10) / 300.0
+    tilt = (((f.seed_value >> 9) % 21) - 10) / 300.0 + (f.diagonal_energy - 0.2) * 0.05
     accent_metalness = 0.01 + f.color_variance * 0.04
     nose_sides = 6 if f.warm_bias < 0 else 9
     return f"""export default function generate(THREE) {{
