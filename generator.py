@@ -119,11 +119,12 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     accent_metalness = 0.01 + f.color_variance * 0.04
     nose_sides = 6 if f.warm_bias < 0 else 9
     cap_lift = body_h / 2 + 0.040 + 0.018 * f.foreground_ratio
+    trim_roughness = 0.80 + min(0.12, f.edge_density * 0.10)
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
   const accentMat = new THREE.MeshStandardMaterial({{ color: {c1}, roughness: 0.64, metalness: 0.02 }});
-  const darkMat = new THREE.MeshStandardMaterial({{ color: {c2}, roughness: 0.88, metalness: 0.0 }});
+  const darkMat = new THREE.MeshStandardMaterial({{ color: {c2}, roughness: {trim_roughness:.4f}, metalness: 0.0 }});
   const lightMat = new THREE.MeshStandardMaterial({{ color: {c3}, roughness: 0.58, metalness: {accent_metalness:.4f} }});
   const body = new THREE.Mesh(new THREE.BoxGeometry({body_w:.4f}, {body_h:.4f}, {body_d:.4f}, 1, 1, 1), baseMat);
   body.rotation.z = {tilt:.4f};
