@@ -20,6 +20,7 @@ class ImageFeatures:
     vertical_symmetry: float
     color_variance: float
     warm_bias: float
+    dominant_ratio: float
     seed_value: int
 
 
@@ -46,7 +47,7 @@ def _fallback_features(stem: str, seed: int) -> ImageFeatures:
     for i in range(4):
         v = _stable_int(f"{stem}:{i}", seed)
         colors.append(f"0x{(v >> 16) & 255:02x}{(v >> 8) & 255:02x}{v & 255:02x}")
-    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, base)
+    return ImageFeatures(colors, 1.0 + ((base % 41) - 20) / 100, 0.55, 0.45, 0.35, 0.65, 0.28, 0.0, 0.25, base)
 
 
 def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
@@ -69,6 +70,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
     quant = np.clip((flat * 5).astype(np.int32), 0, 4)
     bins = quant[:, 0] * 25 + quant[:, 1] * 5 + quant[:, 2]
     counts = np.bincount(bins, minlength=125)
+    dominant_ratio = float(counts.max() / max(1, counts.sum()))
     top = counts.argsort()[-5:][::-1]
     colors = []
     for idx in top:
@@ -92,6 +94,7 @@ def extract_features(stem: str, image_url: str, seed: int) -> ImageFeatures:
         vertical_symmetry=max(0.0, min(1.0, symmetry)),
         color_variance=min(1.0, color_variance * 2.2),
         warm_bias=max(-1.0, min(1.0, warm_bias)),
+        dominant_ratio=dominant_ratio,
         seed_value=_stable_int(stem, seed),
     )
 
