@@ -11,10 +11,14 @@ def main() -> None:
     assert "export default function generate(THREE)" in generator
     assert "Math.random" not in generator
     assert "Date" not in generator
+    assert "color_variance" in generator
+    assert "warm_bias" in generator
+    assert "foreground_ratio" in generator
     assert "@app.get(\"/health\")" in service
     assert "@app.get(\"/status\")" in service
     assert "@app.post(\"/generate\")" in service
     assert "@app.get(\"/results\")" in service
+    assert "prompts must not be empty" in service
     assert "EXPOSE 10006" in dockerfile
     print("ok")
 
