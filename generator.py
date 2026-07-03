@@ -109,7 +109,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     f = extract_features(stem, image_url, seed)
     body_h = 0.32 + 0.12 * f.brightness + 0.05 * f.foreground_ratio
     body_w = min(0.46, max(0.22, 0.31 * f.aspect))
-    body_d = max(0.18, min(0.40, 0.28 + 0.08 * f.edge_density))
+    body_d = max(0.18, min(0.42, 0.26 + 0.08 * f.edge_density + 0.04 * f.saturation))
     segments = 8 if f.edge_density < 0.35 else 12 + int(f.color_variance > 0.45) * 2
     side_count = 2 + int(f.saturation * 4) + int(f.dominant_ratio < 0.18)
     mirrored = "true" if f.vertical_symmetry > 0.58 else "false"
