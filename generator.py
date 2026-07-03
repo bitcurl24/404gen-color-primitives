@@ -121,6 +121,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     cap_lift = body_h / 2 + 0.040 + 0.018 * f.foreground_ratio
     trim_roughness = 0.80 + min(0.12, f.edge_density * 0.10)
     foot_z = body_d * (0.16 + 0.04 * f.vertical_symmetry)
+    cap_rounding = 0.65 + f.saturation * 0.45 + min(0.08, f.color_variance * 0.10)
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
@@ -131,7 +132,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
   body.rotation.z = {tilt:.4f};
   group.add(body);
   const cap = new THREE.Mesh(new THREE.SphereGeometry({min(body_w, body_d) * 0.45:.4f}, {segments}, 6), accentMat);
-  cap.scale.y = {0.65 + f.saturation * 0.45:.4f};
+  cap.scale.y = {cap_rounding:.4f};
   cap.position.y = {cap_lift:.4f};
   group.add(cap);
   const footGeo = new THREE.BoxGeometry({body_w / 3:.4f}, 0.055, {body_d / 2.4:.4f});
