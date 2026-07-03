@@ -15,6 +15,7 @@ def main() -> None:
     assert "warm_bias" in generator
     assert "foreground_ratio" in generator
     assert "foot_z" in generator
+    assert "cap_rounding" in generator
     assert "batch_size" in service
     assert "@app.get(\"/health\")" in service
     assert "@app.get(\"/status\")" in service
