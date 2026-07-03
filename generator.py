@@ -120,6 +120,7 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
     nose_sides = 6 if f.warm_bias < 0 else 9
     cap_lift = body_h / 2 + 0.040 + 0.018 * f.foreground_ratio
     trim_roughness = 0.80 + min(0.12, f.edge_density * 0.10)
+    foot_z = body_d * (0.16 + 0.04 * f.vertical_symmetry)
     return f"""export default function generate(THREE) {{
   const group = new THREE.Group();
   const baseMat = new THREE.MeshStandardMaterial({{ color: {c0}, roughness: 0.72, metalness: 0.03 }});
@@ -137,11 +138,11 @@ def build_module(stem: str, image_url: str, seed: int) -> str:
   for (let i = 0; i < {side_count}; i++) {{
     const t = {side_count} === 1 ? 0 : (i / ({side_count} - 1)) - 0.5;
     const foot = new THREE.Mesh(footGeo, darkMat);
-    foot.position.set(t * {body_w * 0.75:.4f}, {-body_h / 2 - 0.035:.4f}, {body_d * 0.18:.4f});
+    foot.position.set(t * {body_w * 0.75:.4f}, {-body_h / 2 - 0.035:.4f}, {foot_z:.4f});
     group.add(foot);
     if ({mirrored}) {{
       const back = new THREE.Mesh(footGeo, darkMat);
-      back.position.set(t * {body_w * 0.75:.4f}, {-body_h / 2 - 0.035:.4f}, {-body_d * 0.18:.4f});
+      back.position.set(t * {body_w * 0.75:.4f}, {-body_h / 2 - 0.035:.4f}, {-foot_z:.4f});
       group.add(back);
     }}
   }}
